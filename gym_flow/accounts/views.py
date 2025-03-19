@@ -6,7 +6,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
 
-from gym_flow.accounts.forms import AppUserCreationForm, ProfileEditForm
+from gym_flow.accounts.forms import AppUserCreationForm
 from gym_flow.accounts.models import Profile
 
 UserModel = get_user_model()
@@ -30,7 +30,7 @@ class AppUserRegisterView(CreateView):
 
     def get_success_url(self):
         # Use the user's pk for the profile-edit URL
-        return reverse_lazy('profile-edit', kwargs={'pk': self.object.pk})
+        return reverse_lazy('home', kwargs={'pk': self.object.pk})
 
 
 # class ProfileDetailView(DetailView):

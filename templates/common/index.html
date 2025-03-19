@@ -4,9 +4,16 @@
 {% block title %}Home - GymFlow{% endblock %}
 
 {% block content %}
+
     <div class="home-container">
         <h2>Welcome to GymFlow</h2>
         <p>Track your workouts, monitor progress, and achieve your fitness goals!</p>
+        {% if user.is_authenticated %}
+            <p class="login-status logged-in">You are logged in.</p>
+        {% else %}
+            <p class="login-status not-logged-in">You are not logged in.</p>
+        {% endif %}
         <button class="cta-button">Get Started</button>
     </div>
+
 {% endblock %}

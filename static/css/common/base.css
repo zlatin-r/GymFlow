@@ -27,6 +27,15 @@ header h1 {
     color: #fff;
 }
 
+.logo-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.logo-link h1 {
+    margin: 0;
+}
+
 nav a {
     color: #fff;
     margin-left: 20px;

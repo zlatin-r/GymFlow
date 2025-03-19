@@ -18,16 +18,16 @@ class AppUserCreationForm(UserCreationForm):
         fields = ('email',)
 
 
-class ProfileEditForm(forms.ModelForm):
-    class Meta:
-        model = Profile
-        exclude = ('user', )
-
-    date_of_birth = forms.DateField(
-        widget=forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD', 'type': 'date'})
-    )
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        # Override the widget for profile_picture
-        self.fields['profile_picture'].widget = forms.FileInput(attrs={'class': 'file-input'})
+# class ProfileEditForm(forms.ModelForm):
+#     class Meta:
+#         model = Profile
+#         exclude = ('user', )
+#
+#     date_of_birth = forms.DateField(
+#         widget=forms.DateInput(attrs={'placeholder': 'YYYY-MM-DD', 'type': 'date'})
+#     )
+#
+#     def __init__(self, *args, **kwargs):
+#         super().__init__(*args, **kwargs)
+#         # Override the widget for profile_picture
+#         self.fields['profile_picture'].widget = forms.FileInput(attrs={'class': 'file-input'})
