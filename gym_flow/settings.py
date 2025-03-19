@@ -29,7 +29,8 @@ ALLOWED_HOSTS = []
 
 
 USER_APPS = [
-    'gym_flow.accounts.apps.AccountsConfig',
+    'gym_flow.accounts',
+    'gym_flow.common',
 ]
 
 INSTALLED_APPS = [
