@@ -6,22 +6,28 @@
 {% block content %}
     <div class="container">
         <h1>Register</h1>
-        <form class="auth-form">
+        <form method="post" class="auth-form">
+            {% csrf_token %}
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <label for="id_email">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                    <p class="error">{{ form.email.errors }}</p>
+                {% endif %}
             </div>
             <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" id="email" name="email" required>
+                <label for="id_password1">Password</label>
+                {{ form.password1 }}
+                {% if form.password1.errors %}
+                    <p class="error">{{ form.password1.errors }}</p>
+                {% endif %}
             </div>
             <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <div class="form-group">
-                <label for="confirm-password">Confirm Password</label>
-                <input type="password" id="confirm-password" name="confirm-password" required>
+                <label for="id_password2">Confirm Password</label>
+                {{ form.password2 }}
+                {% if form.password2.errors %}
+                    <p class="error">{{ form.password2.errors }}</p>
+                {% endif %}
             </div>
             <button type="submit">Register</button>
             <p>Already have an account? <a href="{% url 'login' %}">Login here</a></p>

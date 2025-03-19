@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, LogoutView
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
@@ -30,7 +30,7 @@ class AppUserRegisterView(CreateView):
 
     def get_success_url(self):
         # Use the user's pk for the profile-edit URL
-        return reverse_lazy('home', kwargs={'pk': self.object.pk})
+        return reverse_lazy('home',)
 
 
 # class ProfileDetailView(DetailView):

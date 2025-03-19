@@ -68,6 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'gym_flow.accounts.context_processors.user_profile',
             ],
         },
     },
@@ -137,4 +138,4 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.AppUser'
 LOGIN_REDIRECT_URL = reverse_lazy('home')
-LOGOUT_REDIRECT_URL = reverse_lazy('login')
+LOGOUT_REDIRECT_URL = reverse_lazy('home')
