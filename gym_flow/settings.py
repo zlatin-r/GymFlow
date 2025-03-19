@@ -28,7 +28,9 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
-# Application definition
+USER_APPS = [
+    'gym_flow.accounts.apps.AccountsConfig',
+]
 
 INSTALLED_APPS = [
     'django.contrib.auth',
@@ -36,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-]
+] + USER_APPS
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
