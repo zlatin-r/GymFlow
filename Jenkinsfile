@@ -27,14 +27,14 @@ pipeline {
             }
         }
 
-        stage('Install venv package') {
-            steps {
-                sh '''
-                apt-get update
-                apt-get install -y python3.11-venv
-                '''
-            }
-        }
+//         stage('Install venv package') {
+//             steps {
+//                 sh '''
+//                 apt-get update
+//                 apt-get install -y python3.11-venv
+//                 '''
+//             }
+//         }
 
 //         stage('Install PostgreSQL') {
 //             steps {
