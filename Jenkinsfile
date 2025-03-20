@@ -1,5 +1,5 @@
 pipeline {
-    agent any  // Run on any available node (e.g., the Jenkins master)
+    agent any
 
     environment {
         POSTGRES_USER = 'postgres'
@@ -18,6 +18,7 @@ pipeline {
         stage('Set up Python') {
             steps {
                 sh '''
+                #!/bin/bash
                 if ! command -v python3 >/dev/null 2>&1; then
                     echo "Python 3 is not installed"
                     exit 1
@@ -30,7 +31,7 @@ pipeline {
         stage('Install venv package') {
             steps {
                 sh '''
-                # Install python3-venv if not available (on Debian/Ubuntu systems)
+                #!/bin/bash
                 apt-get update
                 apt-get install -y python3.11-venv
                 '''
@@ -40,6 +41,7 @@ pipeline {
         stage('Create Virtual Environment') {
             steps {
                 sh '''
+                #!/bin/bash
                 python3 -m venv venv
                 '''
             }
@@ -48,7 +50,7 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 sh '''
-                # Activate the virtual environment and install dependencies
+                #!/bin/bash
                 source venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
@@ -60,6 +62,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    #!/bin/bash
                     psql -U ${POSTGRES_USER} -tc "SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}'" | grep -q 1 || \
                     createdb -U ${POSTGRES_USER} ${POSTGRES_DB}
                     '''
@@ -69,13 +72,21 @@ pipeline {
 
         stage('Run migrations') {
             steps {
-                sh 'source venv/bin/activate && python manage.py migrate'
+                sh '''
+                #!/bin/bash
+                source venv/bin/activate
+                python manage.py migrate
+                '''
             }
         }
 
         stage('Run tests') {
             steps {
-                sh 'source venv/bin/activate && python manage.py test'
+                sh '''
+                #!/bin/bash
+                source venv/bin/activate
+                python manage.py test
+                '''
             }
         }
 
