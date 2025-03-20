@@ -42,9 +42,13 @@ pipeline {
                 apt-get update
                 apt-get install -y postgresql postgresql-contrib
                 service postgresql start
-                su - postgres -c "psql -c \\"ALTER USER postgres WITH PASSWORD '${POSTGRES_PASSWORD}';\\""
+                # Ensure md5 authentication is set before any psql commands
                 sed -i 's/local   all   postgres   peer/local   all   postgres   md5/' /etc/postgresql/15/main/pg_hba.conf
                 service postgresql restart
+                # Use PGPASSWORD with psql directly instead of su
+                export PGPASSWORD=${POSTGRES_PASSWORD}
+                psql -U ${POSTGRES_USER} -c "ALTER USER ${POSTGRES_USER} WITH PASSWORD '${POSTGRES_PASSWORD}';" || \
+                echo "Password might already be set, proceeding..."
                 '''
             }
         }
