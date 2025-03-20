@@ -27,20 +27,20 @@ pipeline {
 //             }
 //         }
 
-//         stage('Create Virtual Environment') {
-//             steps {
-//                 sh '''
-//                 python3 -m venv venv
-//                 # Verify venv creation
-//                 if [ ! -f venv/bin/activate ]; then
-//                     echo "Failed to create virtual environment"
-//                     ls -la
-//                     exit 1
-//                 fi
-//                 echo "Virtual environment created successfully"
-//                 '''
-//             }
-//         }
+        stage('Create Virtual Environment') {
+            steps {
+                sh '''
+                python3 -m venv venv
+                # Verify venv creation
+                if [ ! -f venv/bin/activate ]; then
+                    echo "Failed to create virtual environment"
+                    ls -la
+                    exit 1
+                fi
+                echo "Virtual environment created successfully"
+                '''
+            }
+        }
 
         stage('Install dependencies') {
             steps {
