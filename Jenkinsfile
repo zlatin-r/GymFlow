@@ -36,6 +36,15 @@ pipeline {
             }
         }
 
+        stage('Install PostgreSQL client') {
+            steps {
+                sh '''
+                apt-get update
+                apt-get install -y postgresql-client
+                '''
+            }
+        }
+
         stage('Create Virtual Environment') {
             steps {
                 sh '''
