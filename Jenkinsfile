@@ -9,13 +9,13 @@ pipeline {
         }
 
         stage('Install dependencies') {
-//             steps {
-//                 sh '''
-//                 . venv/bin/activate
-//                 pip install --upgrade pip
-//                 pip install -r requirements.txt
-//                 '''
-//             }
+            steps {
+                sh '''
+                . venv/bin/activate
+                pip install --upgrade pip
+                pip install -r requirements.txt
+                '''
+            }
         }
 
         stage('Run tests') {
