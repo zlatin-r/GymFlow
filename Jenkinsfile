@@ -1,5 +1,11 @@
 pipeline {
-    agent any
+    // Specify an agent with Docker support (adjust label if using a specific node)
+    agent {
+        docker {
+            image 'python:3.11'  // Use a Python image with your required version
+            args '-v /var/run/docker.sock:/var/run/docker.sock'  // Mount host Docker socket
+        }
+    }
 
     environment {
         // Environment variables for PostgreSQL
@@ -14,6 +20,16 @@ pipeline {
             steps {
                 // Checkout the repository
                 checkout scm
+            }
+        }
+
+        stage('Install Docker') {
+            steps {
+                // Install Docker client inside the agent container if not already present
+                sh '''
+                apt-get update && apt-get install -y docker.io || true
+                docker --version
+                '''
             }
         }
 
@@ -41,12 +57,8 @@ pipeline {
 
         stage('Set up Python') {
             steps {
-                // Set up Python 3.11
-                sh '''
-                pyenv install 3.11 -s
-                pyenv global 3.11
-                python --version
-                '''
+                // Python 3.11 is already in the base image, just verify
+                sh 'python --version'
             }
         }
 
