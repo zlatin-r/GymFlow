@@ -1,5 +1,5 @@
 pipeline {
-    agent any  // Run on any available node (e.g., the Jenkins master)
+    agent any
 
     environment {
         POSTGRES_USER = 'postgres'
@@ -30,7 +30,6 @@ pipeline {
         stage('Install venv package') {
             steps {
                 sh '''
-                # Install python3-venv if not available (on Debian/Ubuntu systems)
                 apt-get update
                 apt-get install -y python3.11-venv
                 '''
@@ -48,8 +47,7 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 sh '''
-                # Activate the virtual environment and install dependencies
-                source venv/bin/activate
+                . venv/bin/activate
                 pip install --upgrade pip
                 pip install -r requirements.txt
                 '''
@@ -69,13 +67,19 @@ pipeline {
 
         stage('Run migrations') {
             steps {
-                sh 'source venv/bin/activate && python manage.py migrate'
+                sh '''
+                . venv/bin/activate
+                python manage.py migrate
+                '''
             }
         }
 
         stage('Run tests') {
             steps {
-                sh 'source venv/bin/activate && python manage.py test'
+                sh '''
+                . venv/bin/activate
+                python manage.py test
+                '''
             }
         }
 
