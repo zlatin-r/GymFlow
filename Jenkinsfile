@@ -1,12 +1,11 @@
 pipeline {
-    agent any
+    agent any  // Run on any available node (e.g., the Jenkins master)
 
     environment {
         POSTGRES_USER = 'postgres'
         POSTGRES_PASSWORD = 'password'
         POSTGRES_DB = 'gym_flow_db'
         DATABASE_URL = "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
-        VENV_DIR = "venv"  // Virtual environment directory
     }
 
     stages {
@@ -20,7 +19,7 @@ pipeline {
             steps {
                 sh '''
                 if ! command -v python3 >/dev/null 2>&1; then
-                    echo "Python3 not found. Please install Python 3.11+."
+                    echo "Python 3 is not installed"
                     exit 1
                 fi
                 python3 --version
@@ -28,11 +27,20 @@ pipeline {
             }
         }
 
+        stage('Install venv package') {
+            steps {
+                sh '''
+                # Install python3-venv if not available (on Debian/Ubuntu systems)
+                apt-get update
+                apt-get install -y python3.11-venv
+                '''
+            }
+        }
+
         stage('Create Virtual Environment') {
             steps {
                 sh '''
-                python3 -m venv $VENV_DIR
-                echo "Virtual environment created at $VENV_DIR"
+                python3 -m venv venv
                 '''
             }
         }
@@ -40,10 +48,10 @@ pipeline {
         stage('Install dependencies') {
             steps {
                 sh '''
-                source $VENV_DIR/bin/activate
-                python -m pip install --upgrade pip
+                # Activate the virtual environment and install dependencies
+                source venv/bin/activate
+                pip install --upgrade pip
                 pip install -r requirements.txt
-                deactivate
                 '''
             }
         }
@@ -52,10 +60,8 @@ pipeline {
             steps {
                 script {
                     sh '''
-                    export PGPASSWORD="${POSTGRES_PASSWORD}"
-                    if ! psql -U "${POSTGRES_USER}" -h localhost -c "SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}'" | grep -q 1; then
-                        createdb -U "${POSTGRES_USER}" -h localhost "${POSTGRES_DB}"
-                    fi
+                    psql -U ${POSTGRES_USER} -tc "SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}'" | grep -q 1 || \
+                    createdb -U ${POSTGRES_USER} ${POSTGRES_DB}
                     '''
                 }
             }
@@ -63,21 +69,13 @@ pipeline {
 
         stage('Run migrations') {
             steps {
-                sh '''
-                source $VENV_DIR/bin/activate
-                python manage.py migrate
-                deactivate
-                '''
+                sh 'source venv/bin/activate && python manage.py migrate'
             }
         }
 
         stage('Run tests') {
             steps {
-                sh '''
-                source $VENV_DIR/bin/activate
-                python manage.py test
-                deactivate
-                '''
+                sh 'source venv/bin/activate && python manage.py test'
             }
         }
 
@@ -90,8 +88,7 @@ pipeline {
 
     post {
         always {
-            echo 'Pipeline execution completed'
+            echo 'No Docker containers to stop or remove'
         }
     }
 }
-
