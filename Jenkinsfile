@@ -1,11 +1,12 @@
 pipeline {
-    agent any  // Run on any available node
+    agent any
 
     environment {
         POSTGRES_USER = 'postgres'
         POSTGRES_PASSWORD = 'password'
         POSTGRES_DB = 'gym_flow_db'
         DATABASE_URL = "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
+        VENV_DIR = "venv"  // Virtual environment directory
     }
 
     stages {
@@ -27,11 +28,22 @@ pipeline {
             }
         }
 
+        stage('Create Virtual Environment') {
+            steps {
+                sh '''
+                python3 -m venv $VENV_DIR
+                echo "Virtual environment created at $VENV_DIR"
+                '''
+            }
+        }
+
         stage('Install dependencies') {
             steps {
                 sh '''
-                python3 -m pip install --upgrade pip
-                python3 -m pip install -r requirements.txt
+                source $VENV_DIR/bin/activate
+                python -m pip install --upgrade pip
+                pip install -r requirements.txt
+                deactivate
                 '''
             }
         }
@@ -51,13 +63,21 @@ pipeline {
 
         stage('Run migrations') {
             steps {
-                sh 'python3 manage.py migrate'
+                sh '''
+                source $VENV_DIR/bin/activate
+                python manage.py migrate
+                deactivate
+                '''
             }
         }
 
         stage('Run tests') {
             steps {
-                sh 'python3 manage.py test'
+                sh '''
+                source $VENV_DIR/bin/activate
+                python manage.py test
+                deactivate
+                '''
             }
         }
 
