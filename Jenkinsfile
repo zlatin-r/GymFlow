@@ -36,11 +36,15 @@ pipeline {
             }
         }
 
-        stage('Install PostgreSQL client') {
+        stage('Install PostgreSQL') {
             steps {
                 sh '''
                 apt-get update
-                apt-get install -y postgresql-client
+                apt-get install -y postgresql postgresql-contrib
+                service postgresql start
+                su - postgres -c "psql -c \\"ALTER USER postgres WITH PASSWORD '${POSTGRES_PASSWORD}';\\""
+                sed -i 's/local   all   postgres   peer/local   all   postgres   md5/' /etc/postgresql/15/main/pg_hba.conf
+                service postgresql restart
                 '''
             }
         }
@@ -67,6 +71,7 @@ pipeline {
             steps {
                 script {
                     sh '''
+                    export PGPASSWORD=${POSTGRES_PASSWORD}
                     psql -U ${POSTGRES_USER} -tc "SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}'" | grep -q 1 || \
                     createdb -U ${POSTGRES_USER} ${POSTGRES_DB}
                     '''
