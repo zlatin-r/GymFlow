@@ -71,17 +71,17 @@ pipeline {
             }
         }
 
-        stage('Set up PostgreSQL') {
-            steps {
-                script {
-                    sh '''
-                    export PGPASSWORD=${POSTGRES_PASSWORD}
-                    psql -U ${POSTGRES_USER} -tc "SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}'" | grep -q 1 || \
-                    createdb -U ${POSTGRES_USER} ${POSTGRES_DB}
-                    '''
-                }
-            }
-        }
+//         stage('Set up PostgreSQL') {
+//             steps {
+//                 script {
+//                     sh '''
+//                     export PGPASSWORD=${POSTGRES_PASSWORD}
+//                     psql -U ${POSTGRES_USER} -tc "SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}'" | grep -q 1 || \
+//                     createdb -U ${POSTGRES_USER} ${POSTGRES_DB}
+//                     '''
+//                 }
+//             }
+//         }
 
         stage('Run migrations') {
             steps {
