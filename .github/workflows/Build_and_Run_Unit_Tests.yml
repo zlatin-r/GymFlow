@@ -1,4 +1,4 @@
-name: Django Tests
+name: accounts app tests
 
 on:
   push:
@@ -9,7 +9,7 @@ on:
       - main  # Trigger on pull requests targeting the main branch
 
 jobs:
-  test:
+  Run-Unit-Tests:
     runs-on: ubuntu-latest
 
     services:
@@ -30,7 +30,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.12'  # Use the Python version compatible with Django 5.1.7
+          python-version: '3.11'  # Use the Python version compatible with Django 5.1.7
 
       - name: Install dependencies
         run: |
