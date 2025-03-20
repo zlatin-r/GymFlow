@@ -83,14 +83,14 @@ pipeline {
 //             }
 //         }
 
-        stage('Run migrations') {
-            steps {
-                sh '''
-                . venv/bin/activate
-                python manage.py migrate
-                '''
-            }
-        }
+//         stage('Run migrations') {
+//             steps {
+//                 sh '''
+//                 . venv/bin/activate
+//                 python manage.py migrate
+//                 '''
+//             }
+//         }
 
         stage('Run tests') {
             steps {
