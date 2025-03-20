@@ -1,14 +1,8 @@
 pipeline {
-    // Specify an agent with Docker support (adjust label if using a specific node)
-    agent {
-        docker {
-            image 'python:3.11'  // Use a Python image with your required version
-            args '-v /var/run/docker.sock:/var/run/docker.sock'  // Mount host Docker socket
-        }
-    }
+    agent any  // Run on any available node (e.g., the Jenkins master)
 
     environment {
-        // Environment variables for PostgreSQL
+        // Environment variables for PostgreSQL (assumes a local or network instance)
         POSTGRES_USER = 'postgres'
         POSTGRES_PASSWORD = 'password'
         POSTGRES_DB = 'gym_flow_db'
@@ -18,53 +12,28 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // Checkout the repository
                 checkout scm
-            }
-        }
-
-        stage('Install Docker') {
-            steps {
-                // Install Docker client inside the agent container if not already present
-                sh '''
-                apt-get update && apt-get install -y docker.io || true
-                docker --version
-                '''
-            }
-        }
-
-        stage('Set up PostgreSQL') {
-            steps {
-                script {
-                    // Start PostgreSQL in a Docker container
-                    sh '''
-                    docker run -d --name postgres \
-                      -e POSTGRES_USER=${POSTGRES_USER} \
-                      -e POSTGRES_PASSWORD=${POSTGRES_PASSWORD} \
-                      -e POSTGRES_DB=${POSTGRES_DB} \
-                      -p 5432:5432 \
-                      postgres:13
-                    '''
-                    // Wait for PostgreSQL to be ready
-                    sh '''
-                    until docker exec postgres pg_isready; do
-                      sleep 1
-                    done
-                    '''
-                }
             }
         }
 
         stage('Set up Python') {
             steps {
-                // Python 3.11 is already in the base image, just verify
-                sh 'python --version'
+                // Ensure Python 3.11 is available (assumes pyenv or system Python)
+                sh '''
+                if ! command -v pyenv >/dev/null 2>&1; then
+                    echo "pyenv not found, using system Python"
+                    python3 --version
+                else
+                    pyenv install 3.11 -s || true
+                    pyenv global 3.11
+                    python --version
+                fi
+                '''
             }
         }
 
         stage('Install dependencies') {
             steps {
-                // Install Python dependencies
                 sh '''
                 python -m pip install --upgrade pip
                 pip install -r requirements.txt
@@ -72,33 +41,43 @@ pipeline {
             }
         }
 
+        stage('Set up PostgreSQL') {
+            steps {
+                script {
+                    // Create the database if it doesn’t exist (assumes PostgreSQL is running locally)
+                    sh '''
+                    psql -U ${POSTGRES_USER} -tc "SELECT 1 FROM pg_database WHERE datname = '${POSTGRES_DB}'" | grep -q 1 || \
+                    createdb -U ${POSTGRES_USER} ${POSTGRES_DB}
+                    '''
+                }
+            }
+        }
+
         stage('Run migrations') {
             steps {
-                // Run Django migrations
                 sh 'python manage.py migrate'
             }
         }
 
         stage('Run tests') {
             steps {
-                // Run Django tests
                 sh 'python manage.py test'
             }
         }
 
         stage('Clean up') {
             steps {
-                // Stop and remove the PostgreSQL container
-                sh 'docker stop postgres && docker rm postgres'
+                // Optional: Drop the database (uncomment if desired)
+                // sh 'dropdb -U ${POSTGRES_USER} ${POSTGRES_DB} || true'
+                echo 'Skipping Docker cleanup since no containers were used'
             }
         }
     }
 
     post {
         always {
-            // Clean up Docker containers even if the pipeline fails
-            sh 'docker stop postgres || true'
-            sh 'docker rm postgres || true'
+            // No Docker cleanup needed
+            echo 'No Docker containers to stop or remove'
         }
     }
 }
