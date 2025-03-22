@@ -1,8 +1,7 @@
 from django.contrib.auth import get_user_model, login
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
-from django.contrib.auth.views import LoginView, LogoutView
-from django.core.exceptions import PermissionDenied
-from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.views import LoginView
+from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView
 
@@ -29,8 +28,7 @@ class AppUserRegisterView(CreateView):
         return response
 
     def get_success_url(self):
-        # Use the user's pk for the profile-edit URL
-        return reverse_lazy('home',)
+        return reverse_lazy('home', )
 
 
 class ProfileEditView(UpdateView, LoginRequiredMixin, UserPassesTestMixin):
@@ -44,10 +42,7 @@ class ProfileEditView(UpdateView, LoginRequiredMixin, UserPassesTestMixin):
 
     def get_success_url(self):
         return reverse_lazy(
-            'profile-details',
-            kwargs={
-                'pk': self.object.pk,
-            }
+            'profile-details', kwargs={'pk': self.object.pk, }
         )
 
     def form_valid(self, form):
@@ -59,33 +54,12 @@ class ProfileEditView(UpdateView, LoginRequiredMixin, UserPassesTestMixin):
         return response
 
 
-# class ProfileDetailView(DetailView):
-#     model = UserModel
-#     template_name = 'accounts/profile-details.html'
-#     context_object_name = 'profile'
-#
-#     def get_object(self):
-#         """Ensure the profile is for the logged-in user."""
-#         return get_object_or_404(Profile, user=self.request.user)
-#
-#     def get_context_data(self, **kwargs):
-#         """Add user and workout stats to the context."""
-#         context = super().get_context_data(**kwargs)
-#         user = self.request.user
-#
-#         # Get workout stats
-#         workouts = WorkoutSession.objects.filter(user=user).order_by('-date')[:5]
-#
-#         total_workouts = workouts.count()
-#         total_exercises = sum(workout.exercises.count() for workout in workouts)
-#
-#         # Pass additional context
-#         context['user'] = user  # Ensure 'user' context is available in the template
-#         context['workouts'] = workouts
-#         context['total_workouts'] = total_workouts
-#         context['total_exercises'] = total_exercises
-#
-#         return context
+class ProfileDetailView(DetailView):
+    model = UserModel
+    template_name = 'accounts/profile-details.html'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
 
-
+        return context
