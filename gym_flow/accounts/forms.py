@@ -18,6 +18,11 @@ class AppUserCreationForm(UserCreationForm):
         fields = ('email',)
 
 
+class ProfileEditForm(forms.ModelForm):
+    class Meta:
+        model = UserModel
+        fields = '__all__'
+
 # class ProfileEditForm(forms.ModelForm):
 #     class Meta:
 #         model = Profile
